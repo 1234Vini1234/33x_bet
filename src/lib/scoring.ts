@@ -34,6 +34,42 @@ export type Guess = {
   totalFouls: number | null;
 };
 
+/**
+ * Valida a coerência interna de um palpite: os mercados não podem se contradizer.
+ * Retorna a primeira mensagem de erro encontrada, ou null se o palpite for coerente.
+ *
+ * Regras:
+ *  - Placar × Vencedor: se ambos preenchidos, o vencedor derivado do placar
+ *    deve ser igual ao vencedor escolhido (ex.: placar 1×2 com "Mandante vence" é inválido).
+ *  - Placar × Total de gols: se ambos preenchidos, homeScore + awayScore === totalGoals.
+ *  - Vencedor=Empate × Total de gols: empate exige total de gols par.
+ */
+export function validateGuess(guess: Guess): string | null {
+  const hasScore = guess.homeScore !== null && guess.awayScore !== null;
+
+  // Placar × Vencedor
+  if (hasScore && guess.winnerGuess) {
+    const fromScore = outcomeFromScore(guess.homeScore as number, guess.awayScore as number);
+    if (guess.winnerGuess !== fromScore) {
+      return "O placar contradiz o vencedor escolhido. Ajuste um dos dois.";
+    }
+  }
+
+  // Placar × Total de gols
+  if (hasScore && guess.totalGoals !== null) {
+    if ((guess.homeScore as number) + (guess.awayScore as number) !== guess.totalGoals) {
+      return "O total de gols não bate com o placar informado.";
+    }
+  }
+
+  // Vencedor=Empate × Total de gols (empate só com total par)
+  if (guess.winnerGuess === "DRAW" && guess.totalGoals !== null && guess.totalGoals % 2 !== 0) {
+    return "Empate exige um total de gols par.";
+  }
+
+  return null;
+}
+
 export type Result = {
   homeScore: number;
   awayScore: number;
@@ -93,13 +129,16 @@ export function calcBreakdown(guess: Guess, real: Result, stage: string): Breakd
   let goalsPoints = 0;
   let foulsPoints = 0;
 
-  if (guess.homeScore !== null && guess.awayScore !== null) {
-    scorePoints = round(scoreBase(guess.homeScore, guess.awayScore, real.homeScore, real.awayScore));
+  const hasScore = guess.homeScore !== null && guess.awayScore !== null;
+
+  if (hasScore) {
+    scorePoints = round(scoreBase(guess.homeScore as number, guess.awayScore as number, real.homeScore, real.awayScore));
   }
 
-  // Winner: usa winnerGuess se preenchido; senão deriva do placar (sem dobrar pontos)
-  if (guess.winnerGuess && !(guess.homeScore !== null && guess.awayScore !== null)) {
-    winnerPoints = round(winnerBase(guess.winnerGuess, real.homeScore, real.awayScore));
+  // Vencedor: usa winnerGuess se preenchido; senão deriva do placar (já validado como coerente).
+  const effectiveWinner = guess.winnerGuess ?? (hasScore ? outcomeFromScore(guess.homeScore as number, guess.awayScore as number) : null);
+  if (effectiveWinner) {
+    winnerPoints = round(winnerBase(effectiveWinner, real.homeScore, real.awayScore));
   }
 
   if (guess.totalGoals !== null) {

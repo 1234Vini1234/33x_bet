@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { team } from "@/lib/teams";
 import { stageBadge, formatKickoff, isLive } from "@/lib/stages";
+import { validateGuess } from "@/lib/scoring";
 
 type Palpite = {
   homeScore: number | null;
@@ -143,12 +144,33 @@ function PalpiteCard({ match: m }: { match: MatchData }) {
   const [saving, setSaving] = useState(false);
 
   async function save() {
-    const payload: Record<string, unknown> = { matchId: m.id };
-    if (h !== "" && a !== "") { payload.homeScore = parseInt(h, 10); payload.awayScore = parseInt(a, 10); }
-    else { payload.homeScore = null; payload.awayScore = null; }
-    payload.winnerGuess = winner || null;
-    payload.totalGoals = totalGoals === "" ? null : parseInt(totalGoals, 10);
-    payload.totalFouls = totalFouls === "" ? null : parseInt(totalFouls, 10);
+    const homeScore = h !== "" && a !== "" ? parseInt(h, 10) : null;
+    const awayScore = h !== "" && a !== "" ? parseInt(a, 10) : null;
+    const winnerGuess = winner || null;
+    const totalGoalsVal = totalGoals === "" ? null : parseInt(totalGoals, 10);
+    const totalFoulsVal = totalFouls === "" ? null : parseInt(totalFouls, 10);
+
+    // Validação local de coerência (espelha a regra do servidor) para feedback imediato
+    const inconsistency = validateGuess({
+      homeScore,
+      awayScore,
+      winnerGuess,
+      totalGoals: totalGoalsVal,
+      totalFouls: totalFoulsVal,
+    });
+    if (inconsistency) {
+      setStatus({ kind: "err", msg: inconsistency });
+      return;
+    }
+
+    const payload: Record<string, unknown> = {
+      matchId: m.id,
+      homeScore,
+      awayScore,
+      winnerGuess,
+      totalGoals: totalGoalsVal,
+      totalFouls: totalFoulsVal,
+    };
 
     setSaving(true);
     setStatus(null);
@@ -224,7 +246,7 @@ function PalpiteCard({ match: m }: { match: MatchData }) {
       </div>
 
       <div className="mb-3 relative">
-        <div className="text-[0.65rem] uppercase tracking-widest text-zinc-500 mb-1.5">Quem vence? (palpite sem placar)</div>
+        <div className="text-[0.65rem] uppercase tracking-widest text-zinc-500 mb-1.5">Quem vence? (deve combinar com o placar, se preenchido)</div>
         <div className="grid grid-cols-3 gap-2">
           <OddBtn label="Mandante" sub={home.flag} active={winner === "HOME"} color={home.color} disabled={locked} onClick={() => setWinner(winner === "HOME" ? "" : "HOME")} />
           <OddBtn label="Empate" sub="🟰" active={winner === "DRAW"} color="#a1a1aa" disabled={locked} onClick={() => setWinner(winner === "DRAW" ? "" : "DRAW")} />

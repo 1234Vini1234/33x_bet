@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { validateGuess } from "@/lib/scoring";
 
 const LOCK_MINUTES = 30;
 
@@ -40,6 +41,11 @@ export async function POST(req: Request) {
       totalFouls !== null;
     if (!hasAny) {
       return NextResponse.json({ error: "Preencha ao menos um palpite" }, { status: 400 });
+    }
+
+    const inconsistency = validateGuess({ homeScore, awayScore, winnerGuess, totalGoals, totalFouls });
+    if (inconsistency) {
+      return NextResponse.json({ error: inconsistency }, { status: 400 });
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

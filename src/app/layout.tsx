@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Inter } from "next/font/google";
+import { Anton, Inter } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -8,10 +8,10 @@ const inter = Inter({
   display: "swap",
 });
 
-const bebas = Bebas_Neue({
+const anton = Anton({
   subsets: ["latin"],
   weight: "400",
-  variable: "--font-bebas",
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${bebas.variable}`}>
+    <html lang="pt-BR" className={`${inter.variable} ${anton.variable}`}>
       <body className="antialiased min-h-screen">{children}</body>
     </html>
   );

@@ -1,19 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --c-bg: #07080b;
-  --c-bg-soft: #0e1015;
-  --c-card: #12141b;
-  --c-card-soft: #181b24;
-  --c-border: #232734;
-  --c-text: #f4f4f5;
-  --c-text-soft: #a1a1aa;
-  --c-text-dim: #71717a;
-  --c-gold: #f5c842;
-  --c-green: #00d68f;
-  --c-red: #ff4d6d;
-  --c-blue: #3a86ff;
-  --wc-grad: linear-gradient(90deg, #ff4d6d 0%, #c44569 25%, #6a0dad 55%, #3a86ff 100%);
+  --c-bg: #f7f6f1;
+  --c-bg-soft: #ffffff;
+  --c-card: #ffffff;
+  --c-card-soft: #f1f0ea;
+  --c-border: #e3e1d7;
+  --c-text: #16181d;
+  --c-text-soft: #545861;
+  --c-text-dim: #8a8d94;
+  --c-gold: #f2b705;
+  --c-green: #009c3b;        /* verde bandeira */
+  --c-green-deep: #007a2f;
+  --c-yellow: #ffdf00;       /* amarelo bandeira */
+  --c-blue: #1c4fd6;
+  --c-red: #e23b4e;
+  /* gradiente festivo (verde → amarelo → azul) só para títulos/detalhes */
+  --wc-grad: linear-gradient(90deg, #009c3b 0%, #f2b705 50%, #1c4fd6 100%);
 }
 
 html,
@@ -23,14 +26,15 @@ body {
   min-height: 100vh;
   font-family: var(--font-inter), system-ui, sans-serif;
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(58, 134, 255, 0.12), transparent),
-    radial-gradient(ellipse 60% 50% at 100% 0%, rgba(255, 77, 109, 0.08), transparent);
+    radial-gradient(ellipse 70% 45% at 50% -10%, rgba(0, 156, 59, 0.10), transparent),
+    radial-gradient(ellipse 55% 45% at 100% 0%, rgba(242, 183, 5, 0.10), transparent);
   background-attachment: fixed;
 }
 
 .font-display {
-  font-family: var(--font-bebas), Impact, sans-serif;
-  letter-spacing: 0.02em;
+  font-family: var(--font-display), Impact, sans-serif;
+  letter-spacing: 0.01em;
+  font-weight: 400;
 }
 
 .wc-gradient {
@@ -85,12 +89,13 @@ body {
 }
 
 .btn-primary {
-  background: var(--wc-grad);
-  color: #fff;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, var(--c-green) 0%, var(--c-green-deep) 100%);
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.03em;
   border-radius: 0.75rem;
   padding: 0.55rem 1rem;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 6px 18px rgba(0, 156, 59, 0.25);
   transition: filter 0.15s, transform 0.15s;
 }
 .btn-primary:hover:not(:disabled) {
@@ -113,15 +118,15 @@ body {
   text-align: center;
   font-weight: 700;
   font-size: 1.5rem;
-  font-family: var(--font-bebas), Impact, sans-serif;
+  font-family: var(--font-display), Impact, sans-serif;
   letter-spacing: 0.02em;
   color: var(--c-text);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .score-input:focus {
-  border-color: var(--c-gold);
-  box-shadow: 0 0 0 3px rgba(245, 200, 66, 0.18);
+  border-color: var(--c-green);
+  box-shadow: 0 0 0 3px rgba(0, 156, 59, 0.18);
 }
 .score-input:disabled {
   opacity: 0.5;
@@ -148,14 +153,15 @@ body {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .text-input:focus {
-  border-color: var(--c-gold);
-  box-shadow: 0 0 0 3px rgba(245, 200, 66, 0.18);
+  border-color: var(--c-green);
+  box-shadow: 0 0 0 3px rgba(0, 156, 59, 0.18);
 }
 
 .card {
   background: var(--c-card);
   border: 1px solid var(--c-border);
   border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(22, 24, 29, 0.04), 0 8px 24px rgba(22, 24, 29, 0.06);
 }
 
 .chip {
@@ -174,17 +180,16 @@ body {
 }
 
 .card {
-  transition: border-color 0.15s, transform 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
 .card:hover {
-  border-color: rgba(245, 200, 66, 0.15);
+  border-color: rgba(0, 156, 59, 0.25);
 }
 
 .hero-stripe {
   height: 4px;
   background: var(--wc-grad);
   border-radius: 9999px;
-  box-shadow: 0 0 24px rgba(255, 77, 109, 0.4);
 }
 
 .tabular-nums {
